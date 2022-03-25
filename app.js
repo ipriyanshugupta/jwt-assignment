@@ -16,8 +16,11 @@ app.post("/register", async (req, res) => {
       res.status(400).send("Mobile number is required");
     }
 
+    if(mobile.toString().length !== 10){
+      res.status(400).send("Mobile number should be of ten digits");
+    }
+    //finding user with same Number
     const oldUser = await User.findOne({ mobile });
-
     if (oldUser) {
       return res.status(409).send("Mobile number Already Exist");
     }
@@ -38,7 +41,6 @@ app.post("/register", async (req, res) => {
       role,
       token
     });
-
 
     // return new user
     res.status(201).json(user);
