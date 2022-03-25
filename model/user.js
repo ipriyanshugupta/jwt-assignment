@@ -4,7 +4,6 @@ const userSchema = new mongoose.Schema({
   name: { type: String, default: null },
   mobile: { type: String, unique: true },
   role: { type: String, default: null },
-  location: { type: Object },
   token: { type: String }
 });
 
