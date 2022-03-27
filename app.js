@@ -3,6 +3,7 @@ require("./config/database").connect();
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("./model/user");
+const auth = require("./middleware/auth");
 const app = express();
 app.use(express.json());
 
@@ -17,10 +18,9 @@ app.post("/register", async (req, res) => {
     }
 
     //checking the length of mobile
-    if(mobile.toString().length !== 10){
+    if (mobile.toString().length !== 10) {
       res.status(400).send("Mobile number should be of ten digits");
     }
-    
     //finding user with same Number
     const oldUser = await User.findOne({ mobile });
     if (oldUser) {
@@ -53,29 +53,9 @@ app.post("/register", async (req, res) => {
 
 
 // API for Admin
-app.get("/admin", async (req, res) => {
-  const token = req.body.token;
-  const decoded = jwt.verify(token, "my_secret_key")
-  if (decoded.role === "admin") {
-    const users = await User.find({});
-    res.json(users)
-  }
-  else {
-    res.status(401).json({
-      statusCode: 401,
-      message: "You are not authorized to access this API",
-    });
-  }
-})
+app.get("/admin", auth.verifyAdmin)
 
 // API for User
-app.get("/user", async (req, res) => {
-  const {token} = req.body;
-  const decoded = jwt.verify(token, "my_secret_key")
-  const mobile = decoded.mobile;
-  console.log(mobile)
-  const user = await User.findOne({ mobile });
-  res.json(user)
-})
+app.get("/user", auth.verifyUser)
 
 module.exports = app;
